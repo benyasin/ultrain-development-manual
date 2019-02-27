@@ -155,5 +155,41 @@ class VoteContract extends Contract {
 
 接下来，我们要编写测试用例测试合约业务逻辑的正确性。
 
+测试用例定义在Vote.spec.js文件中。由于合约的owner是ben，所以第一个用例就是用ben来添加几个候选人。
+
+    const U3Utils = require("u3-utils/src");
+    const { createU3, format } = require("u3.js/src");
+    const config = require("../config");
+
+    const chai = require("chai");
+    require("chai")
+      .use(require("chai-as-promised"))
+      .should();
+
+    describe("Tests", function() {
+
+      let creator = "ben";
+
+      it("candidates", async () => {
+        const u3 = createU3(config);
+        await u3.transaction(creator, c => {
+          c.addCandidate("trump", { authorization: [`ben@active`] });
+          c.addCandidate("hillary", { authorization: [`ben@active`] });
+          c.addCandidate("obama", { authorization: [`ben@active`] });
+        });
+
+        U3Utils.test.wait(3000);
+
+        const canditable = "candidate";
+        const candiscope = "s.candidate";
+        let candidates = await u3.getTableRecords({
+          "json": true,
+          "code": creator,
+          "scope": candiscope,
+          "table": canditable
+        });
+        candidates.rows.length.should.equal(3);
+      });
+
 
 
