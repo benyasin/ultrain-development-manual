@@ -157,7 +157,7 @@ class Person implements Serializable{
     salary: u32;
     @ignore
     address: string; // 被忽略，不序列化和反序列化
-    
+
     constructor() {
         this.name = "xx";
         //...
@@ -200,7 +200,7 @@ class Car implements Serializable {
 clas MyContract extends Contract {
     //...
     // your logic here
-}    
+}
 ```
 
 上述代码将会生成两张表格： "persons"和"cars"。 需要注意的是，@database注解中的Person和Car两个类，**必须实现Serializable接口**。
@@ -220,7 +220,7 @@ export class DBManager<T extends Serializable> {
     public exists(primary: u64): boolean {}
     public get(primary: u64, out: T): boolean { }
     public erase(obj: T): void {}
-} 
+}
 ```
 
 constructor\(\)方法接收三个参数，
