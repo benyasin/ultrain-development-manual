@@ -189,7 +189,55 @@ class VoteContract extends Contract {
           "table": canditable
         });
         candidates.rows.length.should.equal(3);
+      });	
+
+如果你使用的WebStorm，则可以定位到candidates这个用例中，直接右键选择Run或Debug ‘candidates’，如果是其它编辑器，也可以在命令行中，执行
+
+`mocha test/Vote.spec.js -g candidates`
+
+当然前提是要全局安装过mocha，否则你需要先执行
+
+`npm install -g mocha`
+
+有了候选人后，我们就可以模拟bob来投给hillary一票了。
+
+    it("bob-voting-hillary", async () => {
+        config.keyProvider = "5JoQtsKQuH8hC9MyvfJAqo6qmKLm8ePYNucs7tPu2YxG12trzBt";
+        const u3 = createU3(config);
+
+        const votingtable = "votes";
+        const votingscope = "s.votes";
+        await u3.getTableRecords({
+          "json": true,
+          "code": creator,
+          "scope": votingscope,
+          "table": votingtable
+        });
+
+        let contract = await u3.contract(creator);
+        await contract.vote("hillary", { authorization: [`bob@active`] });
+
+        U3Utils.test.wait(3000);
+
+        await u3.getTableRecords({
+          "json": true,
+          "code": creator,
+          "scope": votingscope,
+          "table": votingtable
+        });
       });
 
+更多测试用例，不在这里一一赘述，你可以直接查看源代码。
 
+* ##### 前端UI集成
+
+以上是编写智能合约的流程，但作为一个完整的dapp，少不了一个交互友好的用户界面。因此接下来的内容将教你如何将智能合约与前端框架进行集成。
+
+在robin init时，我们已经为vote项目选择过了vue-boilerplate模板，如果一开始选用的纯合约模板，在这一步也可以使用robin ui命令再次将合约项目升级为带界面的dapp项目。
+
+总的来说，我们的界面上需要一个表格来实时的展示每个候选人及其选票数，另外需要一个表单来提交投票信息。接下来，定义一个Voting.vue组件。
+
+在mounted阶段，我们需要将候选人列表与选票列表从数据库中查出来，并双向绑定到DOM上。
+
+注意，我们通过在vue的dat中定义某个状态值，来控制只有选择了某个候选人之后才出现可点击的投票按钮，同时，限制在异步方法的等待过程中，投票按钮是禁用的以防止重复点击。
 
