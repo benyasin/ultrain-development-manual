@@ -92,14 +92,13 @@ u3.getChainInfo((err, info) =>{
 * **sign**
   \[boolean=true\] - 默认是true。使用私钥签名交易。保留未签名的交易避免了提供私钥的需要.
 * **logger**
-  - 默认日志配置.
+  * 默认日志配置.
 
 ```
 logger: {
   log: config.verbose ? console.log : null,  // 如果值为null，则禁用日志
   error: config.verbose ? console.error : null,
 }
-
 ```
 
 ##### Options配置项
@@ -112,13 +111,10 @@ options = {
   broadcast: true,
   sign: true
 }
-
-
 ```
 
 ```
 u3.transfer('alice', 'bob', '1.0000 UGAS', '', options)
-
 ```
 
 * **authorization**
@@ -132,10 +128,9 @@ u3.transfer('alice', 'bob', '1.0000 UGAS', '', options)
 
 ```
 await u3.anyAction('args', {keyProvider})
-await u3.transaction(tr =
->
- { tr.anyAction() }, {keyProvider})
-
+await u3.transaction(tr ={ 
+    tr.anyAction()}, {keyProvider}
+)
 ```
 
 #### 创建账号
@@ -153,8 +148,6 @@ let params = {
    updateable: 1,//可选，账号是否可以更新（更新合约）
 };
 await u3.createUser(params);
- 
-
 ```
 
 #### 转账（UGAS）
@@ -169,7 +162,6 @@ const c = await u3.contract('utrio.token')
 await c.transfer('ben', 'bob', '1.2000 UGAS', '')
 // 使用名称参数
 await c.transfer({from: 'bob', to: 'ben', quantity: '1.3000 UGAS', memo: ''})
-
 ```
 
 #### 签名
@@ -180,7 +172,6 @@ await c.transfer({from: 'bob', to: 'ben', quantity: '1.3000 UGAS', memo: ''})
   const u3_offline = createU3({ sign: false, broadcast: false });
   const c = u3_offline.contract('utrio.token');
   let unsigned_transaction = await c.transfer('ultrainio', 'ben', '1 UGAS', 'uu');
-
 ```
 
 在钱包中你可以提供私钥或助记词来签名，并将签名后的交易发送到链上.
@@ -192,8 +183,6 @@ await c.transfer({from: 'bob', to: 'ben', quantity: '1.3000 UGAS', memo: ''})
      let signedTransaction = Object.assign({}, unsigned_transaction.transaction, { signatures: [signature] });
      let processedTransaction = await u3_online.pushTx(signedTransaction);
   }
-
-
 ```
 
 #### 资源
@@ -207,8 +196,6 @@ const u3 = createU3(config);
 const c = await u3.contract('ultrainio')
 
 await c.resourcelease('ben', 'bob', 1, 10);// 1 slot for 10 days
-
-
 ```
 
 通过以下方法查询资源详情.
@@ -216,8 +203,6 @@ await c.resourcelease('ben', 'bob', 1, 10);// 1 slot for 10 days
 ```
 const resource = await u3.queryResource('abcdefg12345');
 console.log(resource)
-
-
 ```
 
 #### 合约
@@ -231,8 +216,6 @@ console.log(resource)
 ```
   const u3 = createU3(config);
   await u3.deploy(path.resolve(__dirname, '../contracts/token/token'), 'bob');
-
-
 ```
 
 ##### 调用合约
@@ -243,18 +226,15 @@ const c = await u3.contract('ben');
 await c.transfer('bob', 'ben', '1.0000 UGAS','');
 
 //或者像这样调用
-await u3.contract('ben').then(sm =
->
- sm.transfer('bob', 'ben', '1.0000 UGAS',''))
+await u3.contract('ben').then(sm =>
+    sm.transfer('bob', 'ben', '1.0000 UGAS','')
+)
 
 // 一笔交易也可以包含多个合约中的多个action
-await u3.transaction(['ben', 'bob'], ({sm1, sm2}) =
->
- {
+await u3.transaction(['ben', 'bob'], ({sm1, sm2}) =>{
    sm1.myaction(..)
    sm2.myaction(..)
 })
-
 ```
 
 ##### 发行代币
@@ -262,16 +242,13 @@ await u3.transaction(['ben', 'bob'], ({sm1, sm2}) =
 ```
 const u3 = createU3(config);
 const account = 'bob';
-await u3.transaction(account, token =
->
- {
+await u3.transaction(account, token =>{
     token.create(account, '10000000.0000 DDD');
     token.issue(account, '10000000.0000 DDD', 'issue');
 });
 
 const balance = await u3.getCurrencyBalance(account, account, 'DDD')
 console.log('currency balance', balance)
-
 ```
 
 #### 事件
@@ -295,7 +272,6 @@ const subscribe = await u3.registerEvent('ben', 'http://192.168.1.5:3002');
 
 //or
 const unsubscribe = await u3.unregisterEvent('ben', 'http://192.168.1.5:3002');
-
 ```
 
 ##### 监听
@@ -312,7 +288,5 @@ const unsubscribe = await u3.unregisterEvent('ben', 'http://192.168.1.5:3002');
     const contract = await u3.contract(account);
     contract.hi('ben', 30, 'It is a test', { authorization: [`ben@active`] });
 
-
-  
 
 
