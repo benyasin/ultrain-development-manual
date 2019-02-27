@@ -1,4 +1,4 @@
-本指南以一个简单的网络投票系统为例，详细讲述完整dapp的开发流程。
+本指南以一个简单的网络投票系统vote为例，详细讲述完整dapp的开发流程。
 
 * ##### 初始化本地开发环境
 
@@ -37,4 +37,123 @@ module.exports = config;
 ```
 
 而对应的账号与可用资源需要你在测试网络申请，相关操作可以参照[测试网开发配置指南](https://developer.ultrain.io/tutorial/testnet_guide)。
+
+* ##### 编写智能合约
+
+vote的核心逻辑是要实现所有人的公开网络投票。我们采用面向对象的设计思想进行设计，vote涉及的对象有选民、选票，候选人三个。只有管理员才有添加候选人的权限，候选人和选票信息只能添加不能修改。任何人都可以公开投票，每个选民只有投一票的权限，且必须投给一个有效的候选人。
+
+根据上述分析，我们来定义三个Class，同时指定三组表空间与scope空间。
+
+```
+import { Contract } from "ultrain-ts-lib/src/contract";
+import { RNAME, NAME } from "ultrain-ts-lib/src/account";
+import { Action } from "ultrain-ts-lib/src/action";
+import { account_name } from "../../../ultrain-ts-lib/internal/alias";
+
+class Votes implements Serializable {
+  @primaryid
+  name: account_name = 0;
+  count: u32 = 0;
+}
+
+class Voters implements Serializable {
+  @primaryid
+  name: account_name = 0;
+}
+
+class Candidate implements Serializable {
+  @primaryid
+  name: account_name = 0;
+}
+
+const votestable = "votes";
+const votesscope = "s.votes";
+
+const canditable = "candidate";
+const candiscope = "s.candidate";
+
+const voterstable = "voters";
+const votersscope = "s.voters";
+
+@database(Votes, votestable)
+@database(Voters, voterstable)
+@database(Candidate, canditable)
+class VoteContract extends Contract {
+```
+
+接下来，根据上述合约编写的教程，我们知道需要定义DBManager来存取数据库对象。
+
+```
+  candidateDB: DBManager<Candidate>;
+  votesDB: DBManager<Votes>;
+  votersDB: DBManager<Voters>;
+
+  constructor(code: u64) {
+    super(code);
+    this.candidateDB = new DBManager<Candidate>(NAME(canditable), this.receiver, NAME(candiscope));
+    this.votesDB = new DBManager<Votes>(NAME(votestable), this.receiver, NAME(votesscope));
+    this.votersDB = new DBManager<Voters>(NAME(voterstable), this.receiver, NAME(votersscope));
+  }
+```
+
+然后我们来定义添加候选人的方法，这个方法中首先要检查调用者的权限，必须是合约的Owner。候选人以name为唯一性验证，不允许重复添加。最后不要忘了，添加@action注解，才能将这个方法暴露给外部调用。
+
+```
+  @action
+  addCandidate(candidate: account_name): void {
+    ultrain_assert(Action.sender == this.receiver, "only contract owner can add candidates.");
+
+    let c = new Candidate();
+    c.name = candidate;
+    let existing = this.candidateDB.exists(candidate);
+    if (!existing) {
+      this.candidateDB.emplace(this.receiver, c);
+    } else {
+      ultrain_assert(false, "you also add this account as candidate.");
+    }
+  }
+```
+
+最后，我们来定义核心投票的方法。首先要检查权限，如果调用者已经投过票，则拒绝再次投票，如果传进来候选人不在管理员添加的候选人列表中，则认为是无效的候选人，也要拒绝其投票。由于每个Votes有一个记录候选人的选票的count，所以当某候选人的选票为第一票时，直接设count为1，插入新记录，当选票不是第一票时，则要取出原count，加1后，再修改该条记录。
+
+```
+  @action
+  vote(candidate: account_name): void {
+    ultrain_assert(this.votersDB.exists(Action.sender) == false, "you have voted.");
+    ultrain_assert(this.candidateDB.exists(candidate) == true, "you should vote a valid candidate.");
+
+    let votes = new Votes();
+    votes.name = candidate;
+    let existing = this.votesDB.get(candidate, votes);
+    if (existing) {
+      votes.count += 1;
+      this.votesDB.modify(this.receiver, votes);
+    } else {
+      votes.count = 1;
+      this.votesDB.emplace(this.receiver, votes);
+    }
+
+    let voters = new Voters();
+    voters.name = Action.sender;
+    this.votersDB.emplace(this.receiver, voters);
+  }
+```
+
+好了，以上就是合约的全部源代码。
+
+* ##### 语法合法性检查
+
+我们先通过robin lint命令检查一下所写代码的语法合法性，如果有错误，就根据错误提示进行修复。
+
+* ##### 编译并部署合约
+
+如果语法没有错误，那么接下来要做的就是编译合约并部署上链。
+
+通过robin build命令将源代码编译成目标文件，再通过robin deploy命令将目标文件部署到链上。以下是成功部署后的界面。![](/assets/WechatIMG15 %281%29.jpeg)
+
+* ##### 测试业务逻辑正确性
+
+接下来，我们要编写测试用例测试合约业务逻辑的正确性。
+
+
 
