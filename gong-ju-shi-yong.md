@@ -22,9 +22,14 @@ Linux、MacOSX、Windows
 
 **安装**
 
-**`sudo npm install -g robin-framework`**
+`sudo npm install -g robin-framework`
 
+**创建工程**
 
+执行`robin`or`robin -h`来查看所有的robin子命令
 
+要启动项目，首先需要创建一个新的空目录，然后进入目录：
 
+`mkdir testing  
+ cd testing`
 
