@@ -32,7 +32,6 @@ class HelloWorld extends Contract {
         Log.s("hi: name = ").s(RNAME(name)).s(" age = ").i(age, 10).s(" msg = ").s(msg).flush();
     }
 }
-
 ```
 
 我们以上代码做如下说明：
@@ -84,7 +83,31 @@ class HelloContract extends Contract{
 
 使用详情请参考[示例balance](https://github.com/ultrain-os/ultrain-ts-lib/blob/master/example/balance/balance.ts)。
 
+```
+import "allocator/arena";
+import { Contract } from "ultrain-ts-lib/src/contract";
+import { Asset } from "ultrain-ts-lib/src/asset";
+import { ultrain_assert } from "ultrain-ts-lib/src/utils";
+class BalanceContract extends Contract {
 
+    @action
+    transfer(from: account_name, to: account_name, bet: Asset): void {
+
+        let balance = Asset.balanceOf(from);
+        ultrain_assert(balance.gte(bet), "your balance is not enough.");
+
+        balance.prints("banalce from: ");
+
+        Asset.transfer(from, to, bet, "this is a transfer test");
+    }
+}
+```
+
+> NOTICE 使用Asset.transfer命令转移资产时，需要保证`from`的权限已经授权给了`utrio.code`，在使用命令行的情况下，可以通过以下命令来授权:
+>
+> `clutrain set account permission $from active '{"threshold": 1, "keys":[{"key":"$PubKey_of_from", "wieght": 1}], "accounts": [{"permission": {"actor": "$from", "permission": "utrio.code"}, "weight": 1]}' owner -p $from `
+>
+> `$from`是需要授权的帐号。
 
 
 
