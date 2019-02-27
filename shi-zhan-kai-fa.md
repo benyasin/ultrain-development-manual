@@ -189,7 +189,7 @@ class VoteContract extends Contract {
           "table": canditable
         });
         candidates.rows.length.should.equal(3);
-      });	
+      });    
 
 如果你使用的WebStorm，则可以定位到candidates这个用例中，直接右键选择Run或Debug ‘candidates’，如果是其它编辑器，也可以在命令行中，执行
 
@@ -240,4 +240,133 @@ class VoteContract extends Contract {
 在mounted阶段，我们需要将候选人列表与选票列表从数据库中查出来，并双向绑定到DOM上。
 
 注意，我们通过在vue的dat中定义某个状态值，来控制只有选择了某个候选人之后才出现可点击的投票按钮，同时，限制在异步方法的等待过程中，投票按钮是禁用的以防止重复点击。
+
+```
+<script>
+  const { createU3 } = require("u3.js/src");
+  const config = require("../../config");
+  export default {
+    name: "Voting",
+    data() {
+      return {
+        candidate: "",
+        voteFormShow: false,
+        votes: [],
+        candidates: [],
+        voterName: "",
+        privateKey: "",
+        showLoading: false
+      };
+    },
+    async mounted() {
+      let account = "ben";
+      const u3 = createU3(config);
+      const canditable = "candidate";
+      const candiscope = "s.candidate";
+      let candidates = await u3.getTableRecords({
+        "json": true,
+        "code": account,
+        "scope": candiscope,
+        "table": canditable
+      });
+      this.candidates = candidates.rows;
+
+      const votestable = "votes";
+      const votesscope = "s.votes";
+      let votes = await u3.getTableRecords({
+        "json": true,
+        "code": account,
+        "scope": votesscope,
+        "table": votestable
+      });
+      this.votes = votes.rows.sort(this.compare);
+    },
+    methods: {
+```
+
+模板部分的代码如下：
+
+```
+<template>
+    <div class="main">
+        <h1>Voting Result</h1>
+        <table border="1">
+            <thead>
+            <tr>
+                <th>NO.</th>
+                <th>Candidate</th>
+                <th>Count</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-bind:key="v.name" v-for="(v,index) in votes">
+                <td>{{index+1}}</td>
+                <td>{{v.name}}</td>
+                <td>{{v.count}}</td>
+            </tr>
+            </tbody>
+        </table>
+        <h4>All candidates</h4>
+        <div class="form-inline">
+            <select v-model="candidate">
+                <option value="">Choose a candidate</option>
+                <option v-bind:key="c.name" v-for="c in candidates">{{c.name}}</option>
+            </select>
+        </div>
+
+        <div class="go-to-vote" @click="goToVote()">Start voting</div>
+        <div class="vote-form" v-show="voteFormShow">
+            <div class="form-inline">
+                <label>Voter</label><input v-model="voterName"/>
+            </div>
+            <div class="form-inline">
+                <label>PrivateKey</label><input v-model="privateKey"/>
+            </div>
+            <button :disabled="showLoading" v-show="candidate" class="vote-btn" @click="vote()">{{
+                showLoading?"waiting...":"Send votes" }}
+            </button>
+        </div>
+    </div>
+</template>
+```
+
+投票逻辑是合约方法的调用，所有的合约方法调用都是异步接口，而且投票方法是需要签名的。从产生交易Hash后到链上确认是需要10秒以上的，具体多久取决于你的网络拥堵情况。默认的交易过期时间是一分钟，所以如果一分钟后还得不到确认，则可以认为交易失败了。因此我们做一个轮询来处理交易确认后的返回逻辑。
+
+```
+async vote() {
+  if (this.candidate) {
+    let creator = "ben";
+    config.keyProvider = this.privateKey;
+    const u3 = createU3(config);
+    let contract = await u3.contract(creator);
+    let tx = await contract.vote(this.candidate, { authorization: this.voterName + "@active" });
+    this.showLoading = true;
+
+    //等待最长一分钟，来确认交易的最终打包结果
+    let tx_trace = await u3.getTxByTxId(tx.transaction_id);
+    let time = 0;
+    let timer = setInterval(async () => {
+      time++;
+      if (time >= 60) {
+        clearInterval(timer);
+        return;
+      }
+      tx_trace = await u3.getTxByTxId(tx.transaction_id);
+      if (tx_trace.irreversible) {
+        this.showLoading = false;
+        alert("Voted success");
+        clearInterval(timer);
+        document.location.reload();
+      } else {
+        // eslint-disable-next-line
+        console.log("waiting " + time + "s");
+      }
+    }, 1000);
+  }
+}
+```
+
+下图展示的是一次投票后等待的过程。![](/assets/图片 2 %281%29.png)通过以上指南，我们阐述了开发一个dapp的完整过程。当然也略过了一些较复杂或用得较少的功能，比如事件机制等。
+
+如果任何疑问，欢迎给我们提意见，也可以在[本项目](https://github.com/benyasin/dapp-tutorial)的代码库提issue。
 
