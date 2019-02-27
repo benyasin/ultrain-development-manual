@@ -30,7 +30,7 @@ Linux、MacOSX、Windows
 
 要启动项目，首先需要创建一个新的空目录，然后进入目录：
 
-`mkdir testing          
+`mkdir testing            
  cd testing`
 
 然后初始化一个项目。使用`-c`or`--contract`来指定名称。此时，你有多个模板可以选择，默认的是纯合约项目，其余的是带界面的DAPP框架。
