@@ -21,19 +21,19 @@ Robin生成的默认与链交互的U3.js配置信息在根目录下的config.js�
 ```
 const config = {
   httpEndpoint: 'http://benyasin.s1.natapp.cc',
-  httpEndpoint_history: 'http://history.natapp1.cc',
+  httpEndpointHistory: 'http://history.natapp1.cc',
+  chainId: '262ba309c51d91e8c13a7b4bb1b8d25906135317b09805f61fcdf4e044cd71e8',
   broadcast: true,
-  debug: false,
-  verbose: false,
   sign: true,
   logger: {
-    log: console.log,
-    error: console.error,
-    debug: console.log
-  },
-  chainId: '262ba309c51d91e8c13a7b4bb1b8d25906135317b09805f61fcdf4e044cd71e8',
-  keyProvider: '改为你申请的测试网账号的私钥',
-  binaryen: require('binaryen')
+      directory: "../../logs", // daily rotate file directory
+      level: "info", // error->warn->info->verbose->debug->silly
+      console: true, // print to console
+      file: false // append to file
+    },
+  symbol: "UGAS",
+  //keyProvider:['改为你申请的测试网账号的私钥'],
+  //expireInSeconds:60 
 };
 module.exports = config;
 ```
