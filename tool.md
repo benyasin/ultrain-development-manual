@@ -472,12 +472,9 @@ memo: 交易描述文字，可以不填写
 > ** 商城**：Ultrain周边商品可使用积分在商城模块中进行兑换，如Supernova超星小象等。  
 > ** 应用商店入口**：用户可以在UltrainOne APP内查看区块链相关的APP和DApp链接。  
 > ** UGAS查询**：用户除了可以在App上使用移动端钱包外，还可以直接查询ETH钱包内UGAS的数量。  
+> ** 通过Webview与第三方DAPP集成
 > ...  
-
-### UltrainOne
-
-UltrainOne是超脑官方推出的钱包、资讯等综合客户端应用，可满足多钱包管理，UGAS与代币转账及收款，以及与第三方DAPP的集成。
-
-APP下载地址如下：
+ 
+#### UltrainOne下载
 
 ![APP下载](https://user-images.githubusercontent.com/1866848/59660502-4c91ce00-91db-11e9-935b-8ac49cca02b6.png)
