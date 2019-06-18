@@ -480,4 +480,4 @@ UltrainOne是超脑官方推出的钱包、资讯等综合客户端应用，可�
 
 APP下载地址如下：
 
-![APP下载](https://ultrain.io/public/images/app-zh.png)
+![APP下载](https://user-images.githubusercontent.com/1866848/59660502-4c91ce00-91db-11e9-935b-8ac49cca02b6.png)
