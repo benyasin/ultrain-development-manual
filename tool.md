@@ -474,6 +474,10 @@ memo: 交易描述文字，可以不填写
 > ** UGAS查询**：用户除了可以在App上使用移动端钱包外，还可以直接查询ETH钱包内UGAS的数量。  
 > ...  
 
-### UltrainOne下载地址：
+### UltrainOne
 
-![APP](https://ultrain.io/public/images/app-zh.png)
+UltrainOne是超脑官方推出的钱包、资讯等综合客户端应用，可满足多钱包管理，UGAS与代币转账及收款，以及与第三方DAPP的集成。
+
+APP下载地址如下：
+
+![APP下载](https://ultrain.io/public/images/app-zh.png)
