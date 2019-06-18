@@ -1,4 +1,4 @@
-## 一、MacOS下搭建Longclaw环境
+## 一、MacOS下使用Longclaw搭建环境
 
 我们推荐首选的操作系统为MacOS，采用改系统进行开发你将获得极佳的用户体验，
 其次是Linux。Windows由于和Docker的兼容问题较大，不建议用于搭建共识开发环境。
@@ -32,7 +32,7 @@ Longclaw是基于Docker来构建的，所以需要你在本机上提前安装并
 
 ![chain_info](https://user-images.githubusercontent.com/1866848/59199390-683c1980-8bc8-11e9-8988-38b74e4d1a25.jpeg)
 
-## 二、Linux系统下搭建Longclaw环境
+## 二、Linux使用Docker构建环境
 
 Linux下的共识网络环境同样依赖于Docker，关于Linux下的docker环境配置，请参照docker的官方文档，例如ubuntu下docker安装文档为：[`https://docs.docker.com/install/linux/docker-ce/ubuntu/`](https://docs.docker.com/install/linux/docker-ce/ubuntu/)。
 

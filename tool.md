@@ -128,10 +128,10 @@ U3.js主要的任务是Javascript封装的负责与链交互的通用库，具�
 
 #### 在NodeJS环境中使用U3
 请参照以下用法：
-** 安装u3**  
+**安装u3**  
 `npm install u3.js` 或`yarn add u3.js`
 
-** 初始化**  
+**初始化**  
 ```
 const { createU3 } = require('u3.js');
 let config = {
@@ -158,14 +158,10 @@ u3.getChainInfo((err, info) => {
 });
 ```
 
-** 本地环境运行**  
-本地运行u3，需要依赖docker.
->1.从这里[下载docker](https://docs.docker.com/docker-for-mac/install/)并安装;
-2.然后添加中国区镜像地址：https://registry.docker-cn.com;
-3.点击"Apply & Restart"；
-4.进入u3.js/docker && ./start.sh
+**本地环境运行**  
+请参照[环境篇]的MacOS或Linux的环境搭建章节
 
-** 配置**
+**配置**
 + 全局配置
 	+ httpEndpoint string - 链实时API的http或https地址.如果是在浏览器环境中使用u3，请注意配置相同的域名.
 	+ httpEndpointHistory string - 链历史API的http或https地址.如果是在浏览器环境中使用u3，请注意配置相同的域名.
@@ -206,7 +202,7 @@ await u3.transaction(tr => { tr.anyAction() }, {keyProvider})
 ```
 	
 
-** 创建账号**  
+**创建账号**  
 创建账号需要花费creator账号的一些代币，为新账号抵押部分RAM和带宽
 ```
 const u3 = createU3(config);
@@ -239,7 +235,7 @@ await c.empoweruser({
 })
 ```
 
-** 转账（UGAS）**  
+**转账（UGAS**  
 转账方法使用非常频繁，UGAS的转账需要调用系统合约utrio.token。  
 + transfer(from,to,content,memo) 其中content这个字段必须严格为金额与符号拼接的字符串, 如 ‘1.0000 UGAS’  
 
@@ -268,7 +264,7 @@ return tx && tx.irreversible;
 }, timeout, 1000);
 ```
 
-** 签名**  
+**签名**  
 使用 { sign: false, broadcast: false } 创建一个u3实例并且做一些action, 然后将未签名的交易发送到钱包中。  
 ```
   const u3_offline = createU3({ sign: false, broadcast: false });
@@ -285,7 +281,7 @@ return tx && tx.irreversible;
   }
 ```
 
-** 资源**  
+**资源**  
 调用合约只会消耗合约Owner的资源，如果你想部署一个合约，请先购买一些资源。  
 主网环境下,请至[`开发者网站`](https://developer.ultrain.io/resources)上选择合适的资源套餐并进行购买  
 测试网环境下,请至[`测试网浏览器`](https://testnet-explorer.ultrain.io/ultrainio/account-recharge)自行进行账号充值与资源购买。
@@ -303,7 +299,7 @@ const account = await u3.getAccountInfo({ account_name: 'abcdefg12345' });
 console.log(account.chain_resource[0].lease_num)
 ```
 
-** 合约**  
+**合约**  
 + 部署合约  
 部署合约需要提供包含目标文件为 .abi,.wast,*.wasm 的三个文件的文件夹。
 	+ deploy(contracts_files_path, deploy_account) 第一个参数为合约目标文件的绝对路径，第二个合约部署者账号。  
@@ -329,7 +325,8 @@ await u3.transaction(['ben', 'bob'], ({sm1, sm2}) => {
 })
 ```
 
-** 发行代币**   
+**发行代币**   
+智能合约中需实现UIP06或UIP09的接口，具体例子请参照[项目模板](https://github.com/ultrain-os/robin-template)
 ```
 const u3 = createU3(config);
 const account = 'bob';
@@ -342,7 +339,7 @@ const balance = await u3.getCurrencyBalance(account, account, 'DDD')
 console.log('currency balance', balance)
 ```
 
-** 事件**
+**事件**
 Ultrain提供了一个事件注册监听机制用来解决异步场景下业务需求。客户端首先订阅一个事件，
 提供一个用来接收消息的地址，当合约中的某个方法触发时，该地址会收到来自链的推送消息。  
 + 订阅/取消订阅
