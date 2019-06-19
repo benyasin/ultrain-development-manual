@@ -15,29 +15,9 @@
 
 ### 修改上链配置信息
 
-Robin生成的默认与链交互的U3.js配置信息在根目录下的config.js文件中。如果你是基于Longclaw构建的本地开发环境，那么你不需要做任何修改。如果你要基于线上测试网环境做开发，那么你需要修改为如下配置：
-
-```
-const config = {
-  httpEndpoint: 'http://benyasin.s1.natapp.cc',
-  httpEndpointHistory: 'http://history.natapp1.cc',
-  chainId: '262ba309c51d91e8c13a7b4bb1b8d25906135317b09805f61fcdf4e044cd71e8',
-  broadcast: true,
-  sign: true,
-  logger: {
-      directory: "../../logs", // daily rotate file directory
-      level: "info", // error->warn->info->verbose->debug->silly
-      console: true, // print to console
-      file: false // append to file
-    },
-  symbol: "UGAS",
-  //keyProvider:['改为你申请的测试网账号的私钥'],
-  //expireInSeconds:60 
-};
-module.exports = config;
-```
-
-而对应的账号与可用资源需要你在测试网络申请，相关操作可以参照[测试网开发配置指南](https://developer.ultrain.io/tutorial/testnet_guide)。
+Robin生成的默认与链交互的U3.js配置信息在根目录下的config.js文件中。
+如果你是基于Longclaw或Linux下的docker构建的本地开发环境，那么你不需要做任何修改。
+如果你要基于线上测试网环境做开发，那么请参考[环境篇]中测试网相关链的节点配置：
 
 ### 编写智能合约
 
@@ -49,7 +29,6 @@ vote的核心逻辑是要实现所有人的公开网络投票。我们采用面�
 import { Contract } from "ultrain-ts-lib/src/contract";
 import { RNAME, NAME } from "ultrain-ts-lib/src/account";
 import { Action } from "ultrain-ts-lib/src/action";
-import { account_name } from "../../../ultrain-ts-lib/internal/alias";
 
 class Votes implements Serializable {
   @primaryid
@@ -91,9 +70,9 @@ class VoteContract extends Contract {
 
   constructor(code: u64) {
     super(code);
-    this.candidateDB = new DBManager<Candidate>(NAME(canditable), this.receiver, NAME(candiscope));
-    this.votesDB = new DBManager<Votes>(NAME(votestable), this.receiver, NAME(votesscope));
-    this.votersDB = new DBManager<Voters>(NAME(voterstable), this.receiver, NAME(votersscope));
+    this.candidateDB = new DBManager<Candidate>(NAME(canditable), NAME(candiscope));
+    this.votesDB = new DBManager<Votes>(NAME(votestable), NAME(votesscope));
+    this.votersDB = new DBManager<Voters>(NAME(voterstable), NAME(votersscope));
   }
 ```
 
@@ -108,7 +87,7 @@ class VoteContract extends Contract {
     c.name = candidate;
     let existing = this.candidateDB.exists(candidate);
     if (!existing) {
-      this.candidateDB.emplace(this.receiver, c);
+      this.candidateDB.emplace(c);
     } else {
       ultrain_assert(false, "you also add this account as candidate.");
     }
@@ -128,15 +107,15 @@ class VoteContract extends Contract {
     let existing = this.votesDB.get(candidate, votes);
     if (existing) {
       votes.count += 1;
-      this.votesDB.modify(this.receiver, votes);
+      this.votesDB.modify(votes);
     } else {
       votes.count = 1;
-      this.votesDB.emplace(this.receiver, votes);
+      this.votesDB.emplace(votes);
     }
 
     let voters = new Voters();
     voters.name = Action.sender;
-    this.votersDB.emplace(this.receiver, voters);
+    this.votersDB.emplace(voters);
   }
 ```
 
@@ -158,8 +137,7 @@ class VoteContract extends Contract {
 
 测试用例定义在Vote.spec.js文件中。由于合约的owner是ben，所以第一个用例就是用ben来添加几个候选人。
 
-    const U3Utils = require("u3-utils/src");
-    const { createU3, format } = require("u3.js/src");
+    const { createU3, U3Utils } = require("u3.js");
     const config = require("../config");
 
     const chai = require("chai");
@@ -170,7 +148,6 @@ class VoteContract extends Contract {
     describe("Tests", function() {
 
       let creator = "ben";
-
       it("candidates", async () => {
         const u3 = createU3(config);
         await u3.transaction(creator, c => {
@@ -244,7 +221,7 @@ class VoteContract extends Contract {
 
 ```
 <script>
-  const { createU3 } = require("u3.js/src");
+  const { createU3 } = require("u3.js");
   const config = require("../../config");
   export default {
     name: "Voting",
@@ -367,7 +344,9 @@ async vote() {
 }
 ```
 
-下图展示的是一次投票后等待的过程。![](/assets/图片 2 %281%29.png)通过以上指南，我们阐述了开发一个dapp的完整过程。当然也略过了一些较复杂或用得较少的功能，比如事件机制等。
+下图展示的是一次投票后等待的过程。
+![WechatIMG14](https://user-images.githubusercontent.com/1866848/59741806-a9a28800-929e-11e9-9945-ff55fb27810a.jpeg)
+通过以上指南，我们阐述了开发一个dapp的完整过程。当然也略过了一些较复杂或用得较少的功能，比如事件机制等。
 
 如果任何疑问，欢迎给我们提意见，也可以在[本项目](https://github.com/benyasin/dapp-tutorial)的代码库提issue。
 
