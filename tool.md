@@ -27,7 +27,7 @@ Robin框架还提供如下服务：
 ### Robin的使用步骤
 
 #### Robin的安装
-	sudo npm install -g robin-framwork
+	sudo npm install -g robin-framework
 
 #### Robin的使用要求
 >NodeJS8.0+  
