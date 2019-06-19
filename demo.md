@@ -17,7 +17,7 @@
 
 Robin生成的默认与链交互的U3.js配置信息在根目录下的config.js文件中。
 如果你是基于Longclaw或Linux下的docker构建的本地开发环境，那么你不需要做任何修改。
-如果你要基于线上测试网环境做开发，那么请参考[环境篇]中测试网相关链的节点配置：
+如果你要基于线上测试网环境做开发，那么请参考[环境篇]中测试网相关链的节点配置。
 
 ### 编写智能合约
 
@@ -320,26 +320,32 @@ async vote() {
     let tx = await contract.vote(this.candidate, { authorization: this.voterName + "@active" });
     this.showLoading = true;
 
-    //等待最长一分钟，来确认交易的最终打包结果
-    let tx_trace = await u3.getTxByTxId(tx.transaction_id);
-    let time = 0;
-    let timer = setInterval(async () => {
-      time++;
-      if (time >= 60) {
-        clearInterval(timer);
-        return;
-      }
-      tx_trace = await u3.getTxByTxId(tx.transaction_id);
-      if (tx_trace.irreversible) {
+    //检查交易执行状态
+    if (!result || result.processed.receipt.status !== "executed") {
+        //console.log("the transaction was failed");
+        alert("Voted failed");
         this.showLoading = false;
-        alert("Voted success");
-        clearInterval(timer);
-        document.location.reload();
-      } else {
-        // eslint-disable-next-line
-        console.log("waiting " + time + "s");
+        return;
+    }
+    
+     //在交易过期之前检查是否入块
+     let timeout = new Date(result.transaction.transaction.expiration + "Z") - new Date();
+     let finalResult = false;
+     try {
+        await U3Utils.test.waitUntil(async () => {
+          let tx = await u3.getTxByTxId(result.transaction_id);
+          finalResult = tx && tx.irreversible;
+          if (finalResult) {
+            this.showLoading = false;
+            alert("Voted success");
+            document.location.reload();
+    
+            return true;
+          }
+        }, timeout, 1000);
+      } catch (e) {
+        //console.log(finalResult);
       }
-    }, 1000);
   }
 }
 ```
