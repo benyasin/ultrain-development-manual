@@ -2,9 +2,6 @@
 
 Ultrain（超脑链）使用类JavaScript的语言来编写智能合约，该语言以TypeScript为原型，通过扩展的数据类型标志符来达到强类型语言的编程语法.
 
-## 编译工具链和开发环境
-> 参考[robin框架文档](http://developer.ultrain.io/documents)。
-
 ## 系统内置的方法
 * **function NAME(str: string): u64**  
 方法 **NAME()** 用来将一个string转成一个account_name类型. `str`的字符长度不超过12个字符且不能以`.`结尾, 内容只能包括以下字符: `.12345abcdefghijklmnopqrstuvwxyz`
