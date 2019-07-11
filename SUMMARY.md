@@ -1,10 +1,10 @@
 # Summary
 
 * [关于文档](README.md)
-* [基础篇](foundation.md)
-* [架构篇](architecture.md)
-* [环境篇](environment.md)
-* [工具篇](tool.md)
-* [合约篇](contract.md)
-* [中间件篇](middleware.md)
-* [示例篇](demo.md)
+* [基础介绍](foundation.md)
+* [架构设计](architecture.md)
+* [环境配置](environment.md)
+* [开发工具](tool.md)
+* [智能合约](contract.md)
+* [中间件](middleware.md)
+* [DAPP示例](demo.md)
