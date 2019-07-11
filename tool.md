@@ -17,7 +17,8 @@
 ### Robin的介绍
 这是一款基于超脑链，能够快速进行智能合约开发、全局命令行式的开发测试集成框架。  
 Robin框架还提供如下服务：
->1、	一键式合约初始化、编译与部署;  
+
+>1、一键式合约初始化、编译与部署;  
 2、	自动化合约测试与开发;  
 3、	友好的代码审查与错误提示；  
 4、	大量的合约模板与示例参考；  
@@ -34,13 +35,15 @@ Robin框架还提供如下服务：
 Linux、MacOS、Windows
 
 #### 创建工程
+
 执行`robin`或`robin -h`来查看所以的robin的子命令  
 要启动项目，首先需要创建一个新的空目录，然后进入改目录：
 > mkdir testing  
 > cd testing
 
 然后初始化一个项目。使用`-c`或`-contract`来指定名称。此时，你有多个模版可以选择，默认的是
-纯合约项目，其余的是带界面的DAPP框架。
+纯合约项目，其余的是带界面的DAPP框架。如果你在init时未选择UI模板，也可以稍后使用`robin ui`进行演变。
+
 > robin init
 
 ![image](https://user-images.githubusercontent.com/44561751/59589432-7e902b00-911c-11e9-862e-f1e62cd35483.png)
@@ -61,23 +64,29 @@ Linux、MacOS、Windows
 在`robin-lint`的帮助下，借助定制的`tslint`项目，您将找到错误和警告，然后快速修复它们。 只需进入项目的根目录并执行：  
 	
 	robin lint
+	
 #### 编译合约
 依赖于 ultrascript，合约源文件将会被编译为WebAsssembly目标文件: .abi, .wast, *.wasm. 只需进入项目的根目录并执行：
 	
 	robin build
+	
 #### 部署合约
 更新配置文件 config.js 和 migrate.js, 确保你已正确连接上一个超脑节点. 如果你正在使用 longclaw 初始化的
 本地环境，那么使用默认配置即可。如果您的 只需进入项目的根目录并执行：  
 	
 	robin deploy
+	
 #### 测试合约
-参考测试目录下 *.spec.js 文件, 编写测试用例来覆盖你的合约中的所有用例场景. Robin提供给你一些测试工具类，
-比如 mocha, chai, u3.js and u3-utils , 尤其是用在处理异步测试. 只需进入项目的根目录并执行：
+参考测试目录下 *.spec.js 文件, 编写测试用例来覆盖你的合约中的所有用例场景. Robin集成了一些测试工具类，
+比如 mocha, chai, 以及u3.js的U3Utils，以方便你编写出各种测试用例。如果你想按顺序一次性Run所有测试用例，只需进入项目的根目录执行：
 	
 	robin test
+	
+当然，如果你的测试用例之间存在依赖，那么可能会出现部分用例的失败。建议将每一个测试用例封装成独立的，不相互依赖，自封闭的执行环境
+	
 ### 集成UI
-如果你想将一个合约项目升级为带界面的DAPP项目, 使用UI子命令。你有多个框架可以选择，它们分别是 vue-boilerplate、
-react-boilerplate 和 react-native-boilerplate. 只需进入项目的根目录并执行：
+如果你想将一个合约项目升级为带界面的DAPP项目, 使用UI子命令即可。你有多个模板可以选择，它们分别是 vue-boilerplate、
+react-boilerplate 和 react-native-boilerplate（其中前两个模板适用于桌面端应用，最后一个模板适用于移动端应用）,只需进入项目的根目录并执行：
 	
 	robin ui
 
@@ -434,30 +443,7 @@ window.addEventListener('load', function () {
 ​设置页面可以进行网络切换、语言切换，以及钱包修改密码  
 <img src='https://developer.ultrain.io/upload/images/img20190605174023.png' style="zoom:50%">
 
-### Cona.send(params)  
-发起交易请求  
-```
- const to = 'utest1';
-    const contract = 'utrio.token';
-    const quantity = 10;
-    const symbol = 'UGAS';
-    const memo = 'transfer 10.0000 UGAS';
-    window.Cona.send({ to, contract, quantity, symbol, memo }).then((trx) => {
-      // trx为链上返回的交易详情，需要通过u3轮询交易来确认交易结果
-      console.log(trx);
-    }).catch((e) => {
-      // 处理异常
-      console.log(e);
-});
-```  
-params参数介绍如下所示：
->to: 接收账户，类型为字符串  
-contract: 交易的合约名称，类型为字符串  
-quantity: 转账金额，精度请按代币约定填写，如果超出代币的精度则将会被四舍五入，例如UGAS的精度是0.0001，如果传入10.66666，则会被四舍五入为10.6667  
-symbol: 代币单位  
-memo: 交易描述文字，可以不填写  
-返回值：方法是一个异步方法，返回一个promise对象，可以在then中获取到链上返回的交易信息。在catch中捕获异常。  
-注意，为确保send方法能够被正常调起，请首先安装Cona插件，选择合适的网络进行登录，并导入至少一个钱包。  
+关于Cona的接入API,请参考《DAPP接入规范》中的钱包接入章节。
 
 ## 四、UltrainOne  
 为整合和规范管理Ultrain全球社区，Ultrain官方团队开发了Ultrain官方App——UltrainOne。
@@ -474,6 +460,8 @@ memo: 交易描述文字，可以不填写
 > ** UGAS查询**：用户除了可以在App上使用移动端钱包外，还可以直接查询ETH钱包内UGAS的数量。  
 > ** 通过Webview与第三方DAPP集成
 > ...  
+
+关于UltrainOne的接入API,请参考《DAPP接入规范》中的钱包接入章节。
  
 #### UltrainOne下载
 
