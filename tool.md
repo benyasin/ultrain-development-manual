@@ -270,7 +270,7 @@ return tx && tx.irreversible;
 }, timeout, 1000);
 ```
 
-## 签名
+**签名**
 
 使用 `{ sign: false, broadcast: false }` 创建一个u3实例并且做一些action, 然后将未签名的交易发送到钱包中.
 在这种情况下，u3仍然需要网络来发送请求
